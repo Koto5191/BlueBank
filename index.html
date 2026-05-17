@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <title>BlueBank v3（完成版）</title>
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+</head>
+
+<body>
+
+  <div class="card">
+    <h1>🏦 BlueBank v3</h1>
+
+    <div>残高</div>
+    <div class="balance" id="balance">0円</div>
+
+    <input type="number" id="amount" placeholder="金額を入力" />
+
+    <br>
+
+    <button class="deposit" onclick="deposit()">入金</button>
+    <button class="withdraw" onclick="withdraw()">出金</button>
+
+    <h3>📜 履歴</h3>
+    <ul id="history"></ul>
+  </div>
+
+<script>
+/* =========================
+   🔥 Firebase初期化
+========================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyBnbPO7vnZg4ohzCQqTjML4u0Gt2rvX17w",
+  authDomain: "bluebank-5191.firebaseapp.com",
+  projectId: "bluebank-5191",
+  storageBucket: "bluebank-5191.firebasestorage.app",
+  messagingSenderId: "898172429411",
+  appId: "1:898172429411:web:51198f69778744fa2a4456"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+/* =========================
+   🏦 状態
+========================= */
+let balance = 0;
+let history = [];
+
+/* =========================
+   📥 初期ロード
+========================= */
+window.onload = async function () {
+  const doc = await db.collection("bank").doc("main").get();
+
+  if (doc.exists) {
+    const data = doc.data();
+    balance = data.balance || 0;
+    history = data.history || [];
+  }
+
+  render();
+};
+
+/* =========================
+   🎨 画面更新
+========================= */
+function render() {
+  document.getElementById("balance").innerText = balance + "円";
+
+  const list = document.getElementById("history");
+  list.innerHTML = "";
+
+  history.slice().reverse().forEach(text => {
+    const li = document.createElement("li");
+    li.innerText = text;
+    list.appendChild(li);
+  });
+}
+
+/* =========================
+   💾 保存（Firebase）
+========================= */
+function save() {
+  db.collection("bank").doc("main").set({
+    balance: balance,
+    history: history
+  });
+}
+
+/* =========================
+   📦 金額取得
+========================= */
+function getAmount() {
+  return Number(document.getElementById("amount").value);
+}
+
+/* =========================
+   📜 履歴追加（保存しない）
+========================= */
+function addHistory(text) {
+  history.push(text);
+}
+
+/* =========================
+   💰 入金
+========================= */
+function deposit() {
+  const amount = getAmount();
+
+  if (!amount || amount <= 0) {
+    addHistory("⚠ 正しい金額を入力してね");
+    render();
+    save();
+    return;
+  }
+
+  balance += amount;
+  addHistory("＋ " + amount + "円 入金");
+
+  render();
+  save();
+}
+
+/* =========================
+   💸 出金
+========================= */
+function withdraw() {
+  const amount = getAmount();
+
+  if (!amount || amount <= 0) {
+    addHistory("⚠ 正しい金額を入力してね");
+    render();
+    save();
+    return;
+  }
+
+  if (balance < amount) {
+    addHistory("⚠ 残高不足で失敗");
+    render();
+    save();
+    return;
+  }
+
+  balance -= amount;
+  addHistory("－ " + amount + "円 出金");
+
+  render();
+  save();
+}
+</script>
+
+</body>
+</html>
