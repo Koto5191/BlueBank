@@ -63,23 +63,18 @@ body {
   color: var(--text);
   font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 16px;
+  padding: 0;
   transition: background 0.3s, color 0.3s;
 }
 
 /* ---------- カード ---------- */
 .card {
   background: var(--card-bg);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
   padding: 28px 24px 24px;
   width: 100%;
-  max-width: 400px;
+  min-height: 100vh;
   position: relative;
-  transition: background 0.3s, box-shadow 0.3s;
+  transition: background 0.3s;
 }
 
 /* ---------- タイトル ---------- */
