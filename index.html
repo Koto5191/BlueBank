@@ -18,6 +18,7 @@
 
     <div>残高</div>
     <div class="balance" id="balance">0円</div>
+    <div id="next-goal"></div>
 
     <input type="number" id="amount" placeholder="金額を入力" />
 
@@ -72,6 +73,11 @@ window.onload = async function () {
 ========================= */
 function render() {
   document.getElementById("balance").innerText = balance + "円";
+
+  // あと○○円で○万円！
+  const nextMan = Math.ceil((balance + 1) / 10000) * 10000;
+  const diff = nextMan - balance;
+  document.getElementById("next-goal").innerText = "あと" + diff + "円で" + (nextMan / 10000) + "万円！";
 
   const list = document.getElementById("history");
   list.innerHTML = "";
@@ -156,4 +162,4 @@ function withdraw() {
 </script>
 
 </body>
-</html> 
+</html>
