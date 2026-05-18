@@ -1,19 +1,133 @@
-/* カードイラスト */
+/* ================================
+   KotokiBank — style.css
+================================ */
+
+/* ---------- CSS変数（ライトモード） ---------- */
+:root {
+  --bg: #f0f4ff;
+  --card-bg: #ffffff;
+  --text: #1a1f36;
+  --text-muted: #6b7280;
+  --accent: #2563eb;
+  --accent-light: #dbeafe;
+  --deposit-bg: #2563eb;
+  --deposit-text: #ffffff;
+  --withdraw-bg: #f1f5f9;
+  --withdraw-text: #374151;
+  --withdraw-border: #e2e8f0;
+  --input-bg: #f8fafc;
+  --input-border: #cbd5e1;
+  --history-bg: #f8fafc;
+  --history-border: #e2e8f0;
+  --toggle-bg: #e2e8f0;
+  --toggle-text: #374151;
+  --shadow: 0 8px 32px rgba(37, 99, 235, 0.10);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.07);
+  --radius: 20px;
+  --radius-sm: 10px;
+}
+
+/* ---------- CSS変数（ダークモード） ---------- */
+body.dark {
+  --bg: #0f1117;
+  --card-bg: #1a1f2e;
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --accent: #3b82f6;
+  --accent-light: #1e3a5f;
+  --deposit-bg: #2563eb;
+  --deposit-text: #ffffff;
+  --withdraw-bg: #252d3d;
+  --withdraw-text: #cbd5e1;
+  --withdraw-border: #334155;
+  --input-bg: #252d3d;
+  --input-border: #334155;
+  --history-bg: #252d3d;
+  --history-border: #334155;
+  --toggle-bg: #252d3d;
+  --toggle-text: #94a3b8;
+  --shadow: 0 8px 32px rgba(0,0,0,0.4);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* ---------- リセット ---------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---------- ページ全体 ---------- */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ---------- カード ---------- */
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px 24px 24px;
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+/* ---------- タイトル ---------- */
+.card h1 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+/* ---------- テーマ切替ボタン ---------- */
+.theme-toggle {
+  position: absolute;
+  top: 24px;
+  right: 20px;
+  background: var(--toggle-bg);
+  color: var(--toggle-text);
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-family: inherit;
+}
+
+.theme-toggle:hover {
+  opacity: 0.8;
+}
+
+/* ---------- カードイラスト ---------- */
 .card-illust-wrap {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin: 10px 0 20px;
+  margin: 16px 0 20px;
 }
 
 .card-illust {
-  width: 200px;
-  height: 120px;
+  width: 220px;
+  height: 130px;
   object-fit: cover;
   border-radius: 14px;
-  box-shadow: 0 4px 16px rgba(0, 70, 180, 0.15);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.18);
   transition: 0.3s;
+  background: var(--accent-light);
 }
 
 .illust-arrow {
@@ -21,17 +135,170 @@
   color: var(--toggle-text);
   border: none;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   font-size: 20px;
   cursor: pointer;
   transition: 0.2s;
   margin: 0;
   padding: 0;
-  line-height: 32px;
+  line-height: 34px;
+  text-align: center;
 }
 
 .illust-arrow:hover {
   opacity: 0.8;
   transform: scale(1.1);
+}
+
+/* ---------- 残高 ---------- */
+.card > div:nth-of-type(1) {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.balance {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -1px;
+  line-height: 1.1;
+  margin-bottom: 4px;
+  transition: transform 0.15s;
+}
+
+.balance.pop {
+  animation: pop 0.25s ease;
+}
+
+@keyframes pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+#next-goal {
+  font-size: 12px;
+  color: var(--accent);
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+/* ---------- 入力 ---------- */
+input[type="number"] {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1.5px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  padding: 11px 14px;
+  font-size: 16px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+  margin-bottom: 12px;
+}
+
+input[type="number"]:focus {
+  border-color: var(--accent);
+}
+
+input[type="number"]::placeholder {
+  color: var(--text-muted);
+}
+
+/* ---------- 入金・出金ボタン ---------- */
+.deposit,
+.withdraw {
+  display: inline-block;
+  padding: 11px 0;
+  width: calc(50% - 5px);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: 0.18s;
+  font-family: inherit;
+}
+
+.deposit {
+  background: var(--deposit-bg);
+  color: var(--deposit-text);
+  margin-right: 10px;
+}
+
+.deposit:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.deposit:active {
+  transform: translateY(0);
+}
+
+.withdraw {
+  background: var(--withdraw-bg);
+  color: var(--withdraw-text);
+  border: 1.5px solid var(--withdraw-border);
+}
+
+.withdraw:hover {
+  filter: brightness(0.97);
+  transform: translateY(-1px);
+}
+
+.withdraw:active {
+  transform: translateY(0);
+}
+
+/* ---------- 履歴 ---------- */
+.card h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 20px 0 10px;
+}
+
+#history {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+#history::-webkit-scrollbar {
+  width: 4px;
+}
+
+#history::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#history::-webkit-scrollbar-thumb {
+  background: var(--input-border);
+  border-radius: 4px;
+}
+
+#history li {
+  background: var(--history-bg);
+  border: 1px solid var(--history-border);
+  border-radius: var(--radius-sm);
+  padding: 9px 13px;
+  font-size: 13px;
+  color: var(--text-muted);
+  transition: background 0.2s;
+}
+
+#history li:first-child {
+  animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
