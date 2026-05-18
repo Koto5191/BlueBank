@@ -15,7 +15,7 @@
 <body>
   <div class="card">
     <h1>🏦 KotokiBank</h1>
-    <button class="theme-toggle" onclick="toggleTheme()">🌙 ダーク</button>
+    <button class="theme-toggle" onclick="toggleTheme()">ダークモード</button>
 
     <div>残高</div>
     <div class="balance" id="balance">¥0</div>
@@ -61,7 +61,7 @@ window.onload = async function () {
   // テーマ復元
   if (localStorage.getItem("theme") === "dark") {
     document.body.classList.add("dark");
-    document.querySelector(".theme-toggle").innerText = "☀️ ライト";
+    document.querySelector(".theme-toggle").innerText = "ライトモード";
   }
 
   const doc = await db.collection("bank").doc("main").get();
@@ -177,7 +177,7 @@ function withdraw() {
 ========================= */
 function toggleTheme() {
   const isDark = document.body.classList.toggle("dark");
-  document.querySelector(".theme-toggle").innerText = isDark ? "☀️ ライト" : "🌙 ダーク";
+  document.querySelector(".theme-toggle").innerText = isDark ? "ライトモード" : "ダークモード";
   localStorage.setItem("theme", isDark ? "dark" : "light");
 }
 </script>
