@@ -31,135 +31,139 @@
     <ul id="history"></ul>
   </div>
 
-<script>
-/* =========================
-   🔥 Firebase初期化
-========================= */
-const firebaseConfig = {
-  apiKey: "AIzaSyBnbPO7vnZg4ohzCQqTjML4u0Gt2rvX17w",
-  authDomain: "bluebank-5191.firebaseapp.com",
-  projectId: "bluebank-5191",
-  storageBucket: "bluebank-5191.firebasestorage.app",
-  messagingSenderId: "898172429411",
-  appId: "1:898172429411:web:51198f69778744fa2a4456"
-};
+  <script>
+    /* =========================
+       🔥 Firebase初期化
+    ========================= */
+    const firebaseConfig = {
+      apiKey: "AIzaSyBnbPO7vnZg4ohzCQqTjML4u0Gt2rvX17w",
+      authDomain: "bluebank-5191.firebaseapp.com",
+      projectId: "bluebank-5191",
+      storageBucket: "bluebank-5191.firebasestorage.app",
+      messagingSenderId: "898172429411",
+      appId: "1:898172429411:web:51198f69778744fa2a4456"
+    };
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-/* =========================
-   🏦 状態
-========================= */
-let balance = 0;
-let history = [];
+    /* =========================
+       🏦 状態
+    ========================= */
+    let balance = 0;
+    let history = [];
 
-/* =========================
-   📥 初期ロード
-========================= */
-window.onload = async function () {
-  const doc = await db.collection("bank").doc("main").get();
+    /* =========================
+       📥 初期ロード
+    ========================= */
+    window.onload = async function () {
+      const doc = await db.collection("bank").doc("main").get();
 
-  if (doc.exists) {
-    const data = doc.data();
-    balance = data.balance || 0;
-    history = data.history || [];
-  }
+      if (doc.exists) {
+        const data = doc.data();
+        balance = data.balance || 0;
+        history = data.history || [];
+      }
 
-  render();
-};
+      render();
+    };
 
-/* =========================
-   🎨 画面更新
-========================= */
-function render() {
-  document.getElementById("balance").innerText = balance + "円";
+    /* =========================
+       🎨 画面更新
+    ========================= */
+    function render() {
+      const balanceEl = document.getElementById("balance");
+      balanceEl.classList.remove("pop");
+      void balanceEl.offsetWidth;
+      balanceEl.classList.add("pop");
+      balanceEl.innerText = balance + "円";
+      // あと○○円で○万円！
+      const nextMan = Math.ceil((balance + 1) / 10000) * 10000;
+      const diff = nextMan - balance;
+      document.getElementById("next-goal").innerText = "あと" + diff + "円で" + (nextMan / 10000) + "万円！";
 
-  // あと○○円で○万円！
-  const nextMan = Math.ceil((balance + 1) / 10000) * 10000;
-  const diff = nextMan - balance;
-  document.getElementById("next-goal").innerText = "あと" + diff + "円で" + (nextMan / 10000) + "万円！";
+      const list = document.getElementById("history");
+      list.innerHTML = "";
 
-  const list = document.getElementById("history");
-  list.innerHTML = "";
+      history.slice().reverse().forEach(text => {
+        const li = document.createElement("li");
+        li.innerText = text;
+        list.appendChild(li);
+      });
+    }
 
-  history.slice().reverse().forEach(text => {
-    const li = document.createElement("li");
-    li.innerText = text;
-    list.appendChild(li);
-  });
-}
+    /* =========================
+       💾 保存（Firebase）
+    ========================= */
+    function save() {
+      db.collection("bank").doc("main").set({
+        balance: balance,
+        history: history
+      });
+    }
 
-/* =========================
-   💾 保存（Firebase）
-========================= */
-function save() {
-  db.collection("bank").doc("main").set({
-    balance: balance,
-    history: history
-  });
-}
+    /* =========================
+       📦 金額取得
+    ========================= */
+    function getAmount() {
+      return Number(document.getElementById("amount").value);
+    }
 
-/* =========================
-   📦 金額取得
-========================= */
-function getAmount() {
-  return Number(document.getElementById("amount").value);
-}
+    /* =========================
+       📜 履歴追加（保存しない）
+    ========================= */
+    function addHistory(text) {
+      history.push(text);
+    }
 
-/* =========================
-   📜 履歴追加（保存しない）
-========================= */
-function addHistory(text) {
-  history.push(text);
-}
+    /* =========================
+       💰 入金
+    ========================= */
+    function deposit() {
+      const amount = getAmount();
 
-/* =========================
-   💰 入金
-========================= */
-function deposit() {
-  const amount = getAmount();
+      if (!amount || amount <= 0) {
+        addHistory("⚠ 正しい金額を入力してね");
+        render();
+        save();
+        return;
+      }
 
-  if (!amount || amount <= 0) {
-    addHistory("⚠ 正しい金額を入力してね");
-    render();
-    save();
-    return;
-  }
+      balance += amount;
+      addHistory("＋ " + amount + "円 入金");
 
-  balance += amount;
-  addHistory("＋ " + amount + "円 入金");
+      render();
+      save();
+    }
 
-  render();
-  save();
-}
+    /* =========================
+       💸 出金
+    ========================= */
+    function withdraw() {
+      const amount = getAmount();
 
-/* =========================
-   💸 出金
-========================= */
-function withdraw() {
-  const amount = getAmount();
+      if (!amount || amount <= 0) {
+        addHistory("⚠ 正しい金額を入力してね");
+        render();
+        save();
+        return;
+      }
 
-  if (!amount || amount <= 0) {
-    addHistory("⚠ 正しい金額を入力してね");
-    render();
-    save();
-    return;
-  }
+      if (balance < amount) {
+        addHistory("⚠ 残高不足で失敗");
+        render();
+        save();
+        return;
+      }
 
-  if (balance < amount) {
-    addHistory("⚠ 残高不足で失敗");
-    render();
-    save();
-    return;
-  }
+      balance -= amount;
+      addHistory("－ " + amount + "円 出金");
 
-  balance -= amount;
-  addHistory("－ " + amount + "円 出金");
-
-  render();
-  save();
-}
-</script>
+      render();
+      save();
+    }
+  </script>
 
 </body>
+
 </html>
