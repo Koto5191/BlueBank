@@ -1,204 +1,37 @@
-/* =====================
-   テーマ変数
-===================== */
-:root {
-  --bg: linear-gradient(135deg, #e0f2ff, #cfe8ff, #eaf4ff);
-  --card-bg: #ffffff;
-  --card-border: #dbeafe;
-  --card-shadow: rgba(0, 70, 180, 0.15);
-  --card-shadow-hover: rgba(0, 70, 180, 0.2);
-  --title: #1d4ed8;
-  --balance: #2563eb;
-  --subtext: #64748b;
-  --input-bg: #f8fbff;
-  --input-border: #cbd5f5;
-  --history-bg: #f1f7ff;
-  --history-border: #dbeafe;
-  --history-text: #334155;
-  --toggle-bg: #e2eaff;
-  --toggle-text: #1d4ed8;
-}
-
-body.dark {
-  --bg: linear-gradient(135deg, #0f172a, #1e293b, #0f172a);
-  --card-bg: #1e293b;
-  --card-border: #334155;
-  --card-shadow: rgba(0, 0, 0, 0.4);
-  --card-shadow-hover: rgba(0, 0, 0, 0.6);
-  --title: #60a5fa;
-  --balance: #93c5fd;
-  --subtext: #94a3b8;
-  --input-bg: #0f172a;
-  --input-border: #334155;
-  --history-bg: #0f172a;
-  --history-border: #334155;
-  --history-text: #cbd5e1;
-  --toggle-bg: #334155;
-  --toggle-text: #93c5fd;
-}
-
-body {
-  font-family: "Segoe UI", sans-serif;
-  background: var(--bg);
+/* カードイラスト */
+.card-illust-wrap {
   display: flex;
-  justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  margin: 0;
-  padding: 20px;
-  box-sizing: border-box;
-  transition: background 0.4s;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px 0 20px;
 }
 
-/* カードふわっと */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to   { opacity: 1; transform: translateY(0); }
+.card-illust {
+  width: 200px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0, 70, 180, 0.15);
+  transition: 0.3s;
 }
 
-.card {
-  background: var(--card-bg);
-  padding: 35px;
-  border-radius: 22px;
-  width: 90%;
-  max-width: 340px;
-  box-sizing: border-box;
-  box-shadow: 0 20px 60px var(--card-shadow);
-  text-align: center;
-  border: 1px solid var(--card-border);
-  transition: background 0.4s, box-shadow 0.3s, transform 0.3s, border 0.4s;
-  animation: fadeInUp 0.6s ease both;
-  position: relative;
-}
-
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 25px 70px var(--card-shadow-hover);
-}
-
-/* テーマ切替ボタン */
-.theme-toggle {
-  position: absolute;
-  top: 18px;
-  right: 18px;
+.illust-arrow {
   background: var(--toggle-bg);
   color: var(--toggle-text);
   border: none;
-  border-radius: 20px;
-  padding: 6px 12px;
-  font-size: 13px;
-  font-weight: bold;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 20px;
   cursor: pointer;
-  transition: 0.3s;
-  width: auto;
-  margin: 0;
-}
-
-.theme-toggle:hover {
-  opacity: 0.8;
-  transform: scale(1.05);
-}
-
-h1 {
-  margin-bottom: 10px;
-  font-size: 24px;
-  color: var(--title);
-  transition: color 0.4s;
-}
-
-/* 残高ポップ */
-@keyframes balancePop {
-  0%   { transform: scale(1); }
-  40%  { transform: scale(1.15); }
-  70%  { transform: scale(0.95); }
-  100% { transform: scale(1); }
-}
-
-.balance {
-  font-size: 38px;
-  margin: 20px 0 6px;
-  color: var(--balance);
-  font-weight: bold;
-  letter-spacing: 1px;
-  transition: color 0.4s;
-}
-
-.balance.pop {
-  animation: balancePop 0.4s ease;
-}
-
-#next-goal {
-  font-size: 13px;
-  color: var(--subtext);
-  margin-bottom: 16px;
-  transition: color 0.4s;
-}
-
-input {
-  width: 85%;
-  padding: 12px;
-  margin-bottom: 12px;
-  border-radius: 12px;
-  border: 1px solid var(--input-border);
-  font-size: 15px;
-  outline: none;
-  transition: 0.3s;
-  background: var(--input-bg);
-  color: var(--history-text);
-}
-
-input:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
-}
-
-button {
-  padding: 12px;
-  margin: 6px;
-  width: 42%;
-  border: none;
-  border-radius: 14px;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: bold;
   transition: 0.2s;
+  margin: 0;
+  padding: 0;
+  line-height: 32px;
 }
 
-.deposit {
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-  color: white;
-}
-
-.deposit:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
-}
-
-.withdraw {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  color: white;
-}
-
-.withdraw:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
-}
-
-ul {
-  text-align: left;
-  margin-top: 15px;
-  padding: 12px;
-  font-size: 13px;
-  max-height: 140px;
-  overflow-y: auto;
-  background: var(--history-bg);
-  border-radius: 14px;
-  border: 1px solid var(--history-border);
-  transition: background 0.4s, border 0.4s;
-}
-
-ul li {
-  margin-bottom: 6px;
-  color: var(--history-text);
-  transition: color 0.4s;
+.illust-arrow:hover {
+  opacity: 0.8;
+  transform: scale(1.1);
 }

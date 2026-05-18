@@ -15,7 +15,14 @@
 <body>
   <div class="card">
     <h1>🏦 KotokiBank</h1>
-    <button class="theme-toggle" onclick="toggleTheme()">ダークモード</button>
+    <button class="theme-toggle" onclick="toggleTheme()">🌙 ダーク</button>
+
+    <!-- カードイラスト -->
+    <div class="card-illust-wrap">
+      <button class="illust-arrow left" onclick="prevIllust()">‹</button>
+      <img class="card-illust" id="card-illust" src="card1.png" alt="card" />
+      <button class="illust-arrow right" onclick="nextIllust()">›</button>
+    </div>
 
     <div>残高</div>
     <div class="balance" id="balance">¥0</div>
@@ -55,14 +62,38 @@ let balance = 0;
 let history = [];
 
 /* =========================
+   🖼 イラスト
+========================= */
+const ILLUST_COUNT = 4;
+let illustIndex = Number(localStorage.getItem("illustIndex") || 0);
+
+function updateIllust() {
+  document.getElementById("card-illust").src = "card" + (illustIndex + 1) + ".png";
+  localStorage.setItem("illustIndex", illustIndex);
+}
+
+function prevIllust() {
+  illustIndex = (illustIndex - 1 + ILLUST_COUNT) % ILLUST_COUNT;
+  updateIllust();
+}
+
+function nextIllust() {
+  illustIndex = (illustIndex + 1) % ILLUST_COUNT;
+  updateIllust();
+}
+
+/* =========================
    📥 初期ロード
 ========================= */
 window.onload = async function () {
   // テーマ復元
   if (localStorage.getItem("theme") === "dark") {
     document.body.classList.add("dark");
-    document.querySelector(".theme-toggle").innerText = "ライトモード";
+    document.querySelector(".theme-toggle").innerText = "☀️ ライト";
   }
+
+  // イラスト復元
+  updateIllust();
 
   const doc = await db.collection("bank").doc("main").get();
 
@@ -79,14 +110,12 @@ window.onload = async function () {
    🎨 画面更新
 ========================= */
 function render() {
-  // 残高ポップアニメーション
   const balanceEl = document.getElementById("balance");
   balanceEl.classList.remove("pop");
   void balanceEl.offsetWidth;
   balanceEl.classList.add("pop");
   balanceEl.innerText = "¥" + balance.toLocaleString();
 
-  // あと○○円で○万円！
   const nextMan = Math.ceil((balance + 1) / 10000) * 10000;
   const diff = nextMan - balance;
   document.getElementById("next-goal").innerText = "あと¥" + diff.toLocaleString() + "で" + (nextMan / 10000) + "万円！";
@@ -119,7 +148,7 @@ function getAmount() {
 }
 
 /* =========================
-   📜 履歴追加（保存しない）
+   📜 履歴追加
 ========================= */
 function addHistory(text) {
   history.push(text);
@@ -177,7 +206,7 @@ function withdraw() {
 ========================= */
 function toggleTheme() {
   const isDark = document.body.classList.toggle("dark");
-  document.querySelector(".theme-toggle").innerText = isDark ? "ライトモード" : "ダークモード";
+  document.querySelector(".theme-toggle").innerText = isDark ? "☀️ ライト" : "🌙 ダーク";
   localStorage.setItem("theme", isDark ? "dark" : "light");
 }
 </script>
