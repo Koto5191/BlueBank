@@ -24,6 +24,12 @@
       <button class="illust-arrow right" onclick="nextIllust()">›</button>
     </div>
 
+    <!-- 口座タブ -->
+    <div class="tabs">
+      <button class="tab active" id="tab-normal" onclick="switchAccount('normal')">通常口座</button>
+      <button class="tab" id="tab-savings" onclick="switchAccount('savings')">貯金口座</button>
+    </div>
+
     <div>残高</div>
     <div class="balance" id="balance">¥0</div>
     <div id="next-goal"></div>
@@ -58,8 +64,15 @@ const db = firebase.firestore();
 /* =========================
    🏦 状態
 ========================= */
-let balance = 0;
-let history = [];
+let accounts = {
+  normal:  { balance: 0, history: [] },
+  savings: { balance: 0, history: [] }
+};
+let currentAccount = localStorage.getItem("currentAccount") || "normal";
+
+function current() {
+  return accounts[currentAccount];
+}
 
 /* =========================
    🖼 イラスト
@@ -83,6 +96,19 @@ function nextIllust() {
 }
 
 /* =========================
+   🔀 口座切替
+========================= */
+function switchAccount(type) {
+  currentAccount = type;
+  localStorage.setItem("currentAccount", type);
+
+  document.getElementById("tab-normal").classList.toggle("active", type === "normal");
+  document.getElementById("tab-savings").classList.toggle("active", type === "savings");
+
+  render();
+}
+
+/* =========================
    📥 初期ロード
 ========================= */
 window.onload = async function () {
@@ -95,12 +121,21 @@ window.onload = async function () {
   // イラスト復元
   updateIllust();
 
-  const doc = await db.collection("bank").doc("main").get();
+  // タブ復元
+  document.getElementById("tab-normal").classList.toggle("active", currentAccount === "normal");
+  document.getElementById("tab-savings").classList.toggle("active", currentAccount === "savings");
 
-  if (doc.exists) {
-    const data = doc.data();
-    balance = data.balance || 0;
-    history = data.history || [];
+  // Firebase読み込み
+  const normalDoc  = await db.collection("bank").doc("normal").get();
+  const savingsDoc = await db.collection("bank").doc("savings").get();
+
+  if (normalDoc.exists) {
+    accounts.normal.balance  = normalDoc.data().balance || 0;
+    accounts.normal.history  = normalDoc.data().history || [];
+  }
+  if (savingsDoc.exists) {
+    accounts.savings.balance  = savingsDoc.data().balance || 0;
+    accounts.savings.history  = savingsDoc.data().history || [];
   }
 
   render();
@@ -110,6 +145,8 @@ window.onload = async function () {
    🎨 画面更新
 ========================= */
 function render() {
+  const { balance, history } = current();
+
   const balanceEl = document.getElementById("balance");
   balanceEl.classList.remove("pop");
   void balanceEl.offsetWidth;
@@ -122,7 +159,6 @@ function render() {
 
   const list = document.getElementById("history");
   list.innerHTML = "";
-
   history.slice().reverse().forEach(text => {
     const li = document.createElement("li");
     li.innerText = text;
@@ -134,10 +170,8 @@ function render() {
    💾 保存（Firebase）
 ========================= */
 function save() {
-  db.collection("bank").doc("main").set({
-    balance: balance,
-    history: history
-  });
+  const { balance, history } = current();
+  db.collection("bank").doc(currentAccount).set({ balance, history });
 }
 
 /* =========================
@@ -151,7 +185,7 @@ function getAmount() {
    📜 履歴追加
 ========================= */
 function addHistory(text) {
-  history.push(text);
+  current().history.push(text);
 }
 
 /* =========================
@@ -162,16 +196,12 @@ function deposit() {
 
   if (!amount || amount <= 0) {
     addHistory("⚠ 正しい金額を入力してね");
-    render();
-    save();
-    return;
+    render(); save(); return;
   }
 
-  balance += amount;
+  current().balance += amount;
   addHistory("＋ ¥" + amount.toLocaleString() + " 入金");
-
-  render();
-  save();
+  render(); save();
 }
 
 /* =========================
@@ -182,23 +212,17 @@ function withdraw() {
 
   if (!amount || amount <= 0) {
     addHistory("⚠ 正しい金額を入力してね");
-    render();
-    save();
-    return;
+    render(); save(); return;
   }
 
-  if (balance < amount) {
+  if (current().balance < amount) {
     addHistory("⚠ 残高不足で失敗");
-    render();
-    save();
-    return;
+    render(); save(); return;
   }
 
-  balance -= amount;
+  current().balance -= amount;
   addHistory("－ ¥" + amount.toLocaleString() + " 出金");
-
-  render();
-  save();
+  render(); save();
 }
 
 /* =========================
