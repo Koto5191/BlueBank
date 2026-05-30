@@ -26,8 +26,9 @@
 
     <!-- 口座タブ -->
     <div class="tabs">
-      <button class="tab active" id="tab-normal" onclick="switchAccount('normal')">通常口座</button>
-      <button class="tab" id="tab-savings" onclick="switchAccount('savings')">貯金口座</button>
+      <button class="tab active" id="tab-normal" onclick="switchAccount('normal')">通常</button>
+      <button class="tab" id="tab-savings" onclick="switchAccount('savings')">貯金</button>
+      <button class="tab" id="tab-koto" onclick="switchAccount('koto')">Koto</button>
     </div>
 
     <div>残高</div>
@@ -64,9 +65,12 @@ const db = firebase.firestore();
 /* =========================
    🏦 状態
 ========================= */
+const ACCOUNT_TYPES = ["normal", "savings", "koto"];
+
 let accounts = {
   normal:  { balance: 0, history: [] },
-  savings: { balance: 0, history: [] }
+  savings: { balance: 0, history: [] },
+  koto:    { balance: 0, history: [] }
 };
 let currentAccount = localStorage.getItem("currentAccount") || "normal";
 
@@ -102,8 +106,9 @@ function switchAccount(type) {
   currentAccount = type;
   localStorage.setItem("currentAccount", type);
 
-  document.getElementById("tab-normal").classList.toggle("active", type === "normal");
-  document.getElementById("tab-savings").classList.toggle("active", type === "savings");
+  ACCOUNT_TYPES.forEach(t => {
+    document.getElementById("tab-" + t).classList.toggle("active", t === type);
+  });
 
   render();
 }
@@ -122,20 +127,17 @@ window.onload = async function () {
   updateIllust();
 
   // タブ復元
-  document.getElementById("tab-normal").classList.toggle("active", currentAccount === "normal");
-  document.getElementById("tab-savings").classList.toggle("active", currentAccount === "savings");
+  ACCOUNT_TYPES.forEach(t => {
+    document.getElementById("tab-" + t).classList.toggle("active", t === currentAccount);
+  });
 
   // Firebase読み込み
-  const normalDoc  = await db.collection("bank").doc("normal").get();
-  const savingsDoc = await db.collection("bank").doc("savings").get();
-
-  if (normalDoc.exists) {
-    accounts.normal.balance  = normalDoc.data().balance || 0;
-    accounts.normal.history  = normalDoc.data().history || [];
-  }
-  if (savingsDoc.exists) {
-    accounts.savings.balance  = savingsDoc.data().balance || 0;
-    accounts.savings.history  = savingsDoc.data().history || [];
+  for (const type of ACCOUNT_TYPES) {
+    const doc = await db.collection("bank").doc(type).get();
+    if (doc.exists) {
+      accounts[type].balance = doc.data().balance || 0;
+      accounts[type].history = doc.data().history || [];
+    }
   }
 
   render();
@@ -159,6 +161,7 @@ function render() {
 
   const list = document.getElementById("history");
   list.innerHTML = "";
+
   history.slice().reverse().forEach(text => {
     const li = document.createElement("li");
     li.innerText = text;
@@ -196,12 +199,15 @@ function deposit() {
 
   if (!amount || amount <= 0) {
     addHistory("⚠ 正しい金額を入力してね");
-    render(); save(); return;
+    render();
+    save();
+    return;
   }
 
   current().balance += amount;
   addHistory("＋ ¥" + amount.toLocaleString() + " 入金");
-  render(); save();
+  render();
+  save();
 }
 
 /* =========================
@@ -212,17 +218,22 @@ function withdraw() {
 
   if (!amount || amount <= 0) {
     addHistory("⚠ 正しい金額を入力してね");
-    render(); save(); return;
+    render();
+    save();
+    return;
   }
 
   if (current().balance < amount) {
     addHistory("⚠ 残高不足で失敗");
-    render(); save(); return;
+    render();
+    save();
+    return;
   }
 
   current().balance -= amount;
   addHistory("－ ¥" + amount.toLocaleString() + " 出金");
-  render(); save();
+  render();
+  save();
 }
 
 /* =========================
