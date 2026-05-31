@@ -1,127 +1,132 @@
-/* =====================
-   テーマ変数
-===================== */
+/* ================================
+   KotokiBank — style.css
+================================ */
+
+/* ---------- CSS変数（ライトモード） ---------- */
 :root {
-  --bg: linear-gradient(135deg, #e0f2ff, #cfe8ff, #eaf4ff);
+  --bg: #f0f4ff;
   --card-bg: #ffffff;
+  --text: #1a1f36;
+  --text-muted: #6b7280;
+  --accent: #2563eb;
+  --accent-light: #dbeafe;
+  --deposit-bg: #2563eb;
+  --deposit-text: #ffffff;
+  --withdraw-bg: #f1f5f9;
+  --withdraw-text: #374151;
+  --withdraw-border: #e2e8f0;
+  --input-bg: #f8fafc;
+  --input-border: #cbd5e1;
+  --history-bg: #f8fafc;
+  --history-border: #e2e8f0;
+  --toggle-bg: #e2e8f0;
+  --toggle-text: #374151;
+  --shadow: 0 8px 32px rgba(37, 99, 235, 0.10);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.07);
+  --radius: 20px;
+  --radius-sm: 10px;
   --card-border: #dbeafe;
-  --card-shadow: rgba(0, 70, 180, 0.15);
-  --card-shadow-hover: rgba(0, 70, 180, 0.2);
-  --title: #1d4ed8;
-  --balance: #2563eb;
-  --subtext: #64748b;
-  --input-bg: #f8fbff;
-  --input-border: #cbd5f5;
-  --history-bg: #f1f7ff;
-  --history-border: #dbeafe;
-  --history-text: #334155;
-  --toggle-bg: #e2eaff;
-  --toggle-text: #1d4ed8;
+  --subtext: #6b7280;
 }
 
+/* ---------- CSS変数（ダークモード） ---------- */
 body.dark {
-  --bg: linear-gradient(135deg, #0f172a, #1e293b, #0f172a);
-  --card-bg: #1e293b;
-  --card-border: #334155;
-  --card-shadow: rgba(0, 0, 0, 0.4);
-  --card-shadow-hover: rgba(0, 0, 0, 0.6);
-  --title: #60a5fa;
-  --balance: #93c5fd;
-  --subtext: #94a3b8;
-  --input-bg: #0f172a;
+  --bg: #0f1117;
+  --card-bg: #1a1f2e;
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --accent: #3b82f6;
+  --accent-light: #1e3a5f;
+  --deposit-bg: #2563eb;
+  --deposit-text: #ffffff;
+  --withdraw-bg: #252d3d;
+  --withdraw-text: #cbd5e1;
+  --withdraw-border: #334155;
+  --input-bg: #252d3d;
   --input-border: #334155;
-  --history-bg: #0f172a;
+  --history-bg: #252d3d;
   --history-border: #334155;
-  --history-text: #cbd5e1;
-  --toggle-bg: #334155;
-  --toggle-text: #93c5fd;
+  --toggle-bg: #252d3d;
+  --toggle-text: #94a3b8;
+  --shadow: 0 8px 32px rgba(0,0,0,0.4);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+  --card-border: #334155;
+  --subtext: #94a3b8;
 }
 
-body {
-  font-family: "Segoe UI", sans-serif;
-  background: var(--bg);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  margin: 0;
-  padding: 20px;
+/* ---------- リセット ---------- */
+*, *::before, *::after {
   box-sizing: border-box;
-  transition: background 0.4s;
+  margin: 0;
+  padding: 0;
 }
 
-/* カードふわっと */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to   { opacity: 1; transform: translateY(0); }
+/* ---------- ページ全体 ---------- */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+  min-height: 100vh;
+  padding: 0;
+  transition: background 0.3s, color 0.3s;
 }
 
+/* ---------- カード ---------- */
 .card {
   background: var(--card-bg);
-  padding: 35px;
-  border-radius: 22px;
-  width: 90%;
-  max-width: 340px;
-  box-sizing: border-box;
-  box-shadow: 0 20px 60px var(--card-shadow);
-  text-align: center;
-  border: 1px solid var(--card-border);
-  transition: background 0.4s, box-shadow 0.3s, transform 0.3s, border 0.4s;
-  animation: fadeInUp 0.6s ease both;
+  padding: 28px 24px 24px;
+  width: 100%;
+  min-height: 100vh;
   position: relative;
+  transition: background 0.3s;
 }
 
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 25px 70px var(--card-shadow-hover);
+/* ---------- タイトル ---------- */
+.card h1 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--text);
+  margin-bottom: 4px;
 }
 
-/* テーマ切替ボタン */
+/* ---------- テーマ切替ボタン ---------- */
 .theme-toggle {
   position: absolute;
-  top: 18px;
-  right: 18px;
+  top: 24px;
+  right: 20px;
   background: var(--toggle-bg);
   color: var(--toggle-text);
   border: none;
   border-radius: 20px;
-  padding: 6px 12px;
+  padding: 6px 14px;
   font-size: 13px;
-  font-weight: bold;
   cursor: pointer;
-  transition: 0.3s;
-  width: auto;
-  margin: 0;
+  transition: 0.2s;
+  font-family: inherit;
 }
 
 .theme-toggle:hover {
   opacity: 0.8;
-  transform: scale(1.05);
 }
 
-h1 {
-  margin-bottom: 10px;
-  font-size: 24px;
-  color: var(--title);
-  transition: color 0.4s;
-}
-
-/* カードイラスト */
+/* ---------- カードイラスト ---------- */
 .card-illust-wrap {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin: 10px 0 20px;
+  margin: 16px 0 40px;
 }
 
 .card-illust {
-  width: 200px;
-  height: 120px;
+  width: 300px;
+  height: 180px;
   object-fit: cover;
   border-radius: 14px;
-  box-shadow: 0 4px 16px rgba(0, 70, 180, 0.15);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.18);
   transition: 0.3s;
+  background: var(--accent-light);
 }
 
 .illust-arrow {
@@ -129,14 +134,15 @@ h1 {
   color: var(--toggle-text);
   border: none;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   font-size: 20px;
   cursor: pointer;
   transition: 0.2s;
   margin: 0;
   padding: 0;
-  line-height: 32px;
+  line-height: 34px;
+  text-align: center;
 }
 
 .illust-arrow:hover {
@@ -144,7 +150,159 @@ h1 {
   transform: scale(1.1);
 }
 
-/* タブ */
+/* ---------- 残高 ---------- */
+.card > div:nth-of-type(1) {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.balance {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -1px;
+  line-height: 1.1;
+  margin-bottom: 4px;
+  transition: transform 0.15s;
+}
+
+.balance.pop {
+  animation: pop 0.25s ease;
+}
+
+@keyframes pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+#next-goal {
+  font-size: 12px;
+  color: var(--accent);
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+/* ---------- 入力 ---------- */
+input[type="number"] {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1.5px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  padding: 11px 14px;
+  font-size: 16px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+  margin-bottom: 12px;
+}
+
+input[type="number"]:focus {
+  border-color: var(--accent);
+}
+
+input[type="number"]::placeholder {
+  color: var(--text-muted);
+}
+
+/* ---------- 入金・出金ボタン ---------- */
+.deposit,
+.withdraw {
+  display: inline-block;
+  padding: 11px 0;
+  width: calc(50% - 5px);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: 0.18s;
+  font-family: inherit;
+}
+
+.deposit {
+  background: var(--deposit-bg);
+  color: var(--deposit-text);
+  margin-right: 10px;
+}
+
+.deposit:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.deposit:active {
+  transform: translateY(0);
+}
+
+.withdraw {
+  background: var(--withdraw-bg);
+  color: var(--withdraw-text);
+  border: 1.5px solid var(--withdraw-border);
+}
+
+.withdraw:hover {
+  filter: brightness(0.97);
+  transform: translateY(-1px);
+}
+
+.withdraw:active {
+  transform: translateY(0);
+}
+
+/* ---------- 履歴 ---------- */
+.card h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 20px 0 10px;
+}
+
+#history {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+#history::-webkit-scrollbar {
+  width: 4px;
+}
+
+#history::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#history::-webkit-scrollbar-thumb {
+  background: var(--input-border);
+  border-radius: 4px;
+}
+
+#history li {
+  background: var(--history-bg);
+  border: 1px solid var(--history-border);
+  border-radius: var(--radius-sm);
+  padding: 9px 13px;
+  font-size: 13px;
+  color: var(--text-muted);
+  transition: background 0.2s;
+}
+
+#history li:first-child {
+  animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- タブ ---------- */
 .tabs {
   display: flex;
   gap: 8px;
@@ -165,6 +323,7 @@ h1 {
   transition: 0.2s;
   width: auto;
   margin: 0;
+  font-family: inherit;
 }
 
 .tab.active {
@@ -176,117 +335,50 @@ h1 {
 
 .tab:hover:not(.active) {
   border-color: #3b82f6;
-  color: var(--balance);
+  color: var(--accent);
 }
 
-/* 残高ポップ */
-@keyframes balancePop {
-  0%   { transform: scale(1); }
-  40%  { transform: scale(1.15); }
-  70%  { transform: scale(0.95); }
-  100% { transform: scale(1); }
+/* ---------- ロック画面 ---------- */
+#lock-screen {
+  text-align: center;
+  padding: 20px 0;
 }
 
-.balance {
-  font-size: 38px;
-  margin: 20px 0 6px;
-  color: var(--balance);
-  font-weight: bold;
-  letter-spacing: 1px;
-  transition: color 0.4s;
-}
-
-.balance.pop {
-  animation: balancePop 0.4s ease;
-}
-
-#next-goal {
-  font-size: 13px;
-  color: var(--subtext);
-  margin-bottom: 16px;
-  transition: color 0.4s;
-}
-
-input {
-  width: 85%;
-  padding: 12px;
-  margin-bottom: 12px;
-  border-radius: 12px;
-  border: 1px solid var(--input-border);
-  font-size: 15px;
-  outline: none;
-  transition: 0.3s;
-  background: var(--input-bg);
-  color: var(--history-text);
-}
-
-input:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
-}
-
-button {
-  padding: 12px;
-  margin: 6px;
-  width: 42%;
-  border: none;
-  border-radius: 14px;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: bold;
-  transition: 0.2s;
-}
-
-.deposit {
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-  color: white;
-}
-
-.deposit:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
-}
-
-.withdraw {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  color: white;
-}
-
-.withdraw:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
-}
-
-ul {
-  text-align: left;
-  margin-top: 15px;
-  padding: 12px;
-  font-size: 13px;
-  max-height: 140px;
-  overflow-y: auto;
-  background: var(--history-bg);
-  border-radius: 14px;
-  border: 1px solid var(--history-border);
-  transition: background 0.4s, border 0.4s;
-}
-
-ul li {
-  margin-bottom: 6px;
-  color: var(--history-text);
-  transition: color 0.4s;
-}
-
-/* ロック画面 */
 .lock-icon {
   font-size: 48px;
   margin: 20px 0 8px;
 }
 
 .lock-text {
-  font-size: 16px;
-  color: var(--subtext);
+  font-size: 15px;
+  color: var(--text-muted);
   margin-bottom: 16px;
-  font-weight: bold;
+  font-weight: 600;
+}
+
+input[type="password"] {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1.5px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  padding: 11px 14px;
+  font-size: 16px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+  margin-bottom: 8px;
+  text-align: center;
+  letter-spacing: 4px;
+}
+
+input[type="password"]:focus {
+  border-color: var(--accent);
+}
+
+input[type="password"]::placeholder {
+  letter-spacing: 0;
+  color: var(--text-muted);
 }
 
 #password-error {
@@ -297,23 +389,38 @@ ul li {
 }
 
 .unlock-btn {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  background: var(--deposit-bg);
   color: white;
-  width: 160px;
-  margin-top: 8px;
+  width: 100%;
+  padding: 11px 0;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: 0.18s;
+  font-family: inherit;
+  margin-top: 4px;
 }
 
 .unlock-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+  filter: brightness(1.1);
+  transform: translateY(-1px);
 }
 
 .cancel-btn {
   background: transparent;
-  color: var(--subtext);
-  border: 1px solid var(--card-border);
-  width: 160px;
-  margin-top: 6px;
+  color: var(--text-muted);
+  border: 1.5px solid var(--input-border);
+  width: 100%;
+  padding: 11px 0;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.18s;
+  font-family: inherit;
+  margin-top: 8px;
 }
 
 .cancel-btn:hover {
