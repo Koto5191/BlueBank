@@ -333,3 +333,35 @@ input[type="number"]::placeholder {
   border-color: #3b82f6;
   color: var(--balance);
 }
+
+/* ロック画面 */
+.lock-icon {
+  font-size: 48px;
+  margin: 20px 0 8px;
+}
+
+.lock-text {
+  font-size: 16px;
+  color: var(--subtext);
+  margin-bottom: 16px;
+  font-weight: bold;
+}
+
+#password-error {
+  font-size: 13px;
+  color: #ef4444;
+  margin-bottom: 8px;
+  min-height: 20px;
+}
+
+.unlock-btn {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  width: 120px;
+  margin-top: 8px;
+}
+
+.unlock-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+}

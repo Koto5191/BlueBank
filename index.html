@@ -31,19 +31,31 @@
       <button class="tab" id="tab-koto" onclick="switchAccount('koto')">Koto</button>
     </div>
 
-    <div>残高</div>
-    <div class="balance" id="balance">¥0</div>
-    <div id="next-goal"></div>
+    <!-- ロック画面 -->
+    <div id="lock-screen" style="display:none;">
+      <div class="lock-icon">🔒</div>
+      <div class="lock-text">ロックされています</div>
+      <input type="password" id="password-input" placeholder="パスワードを入力" />
+      <div id="password-error"></div>
+      <button class="unlock-btn" onclick="tryUnlock()">解除</button>
+    </div>
 
-    <input type="number" id="amount" placeholder="金額を入力" />
+    <!-- メイン画面 -->
+    <div id="main-screen">
+      <div>残高</div>
+      <div class="balance" id="balance">¥0</div>
+      <div id="next-goal"></div>
 
-    <br>
+      <input type="number" id="amount" placeholder="金額を入力" />
 
-    <button class="deposit" onclick="deposit()">入金</button>
-    <button class="withdraw" onclick="withdraw()">出金</button>
+      <br>
 
-    <h3>📜 履歴</h3>
-    <ul id="history"></ul>
+      <button class="deposit" onclick="deposit()">入金</button>
+      <button class="withdraw" onclick="withdraw()">出金</button>
+
+      <h3>📜 履歴</h3>
+      <ul id="history"></ul>
+    </div>
   </div>
 
 <script>
@@ -66,6 +78,8 @@ const db = firebase.firestore();
    🏦 状態
 ========================= */
 const ACCOUNT_TYPES = ["normal", "savings", "koto"];
+const SAVINGS_PASSWORD = "1121";
+let savingsUnlocked = false;
 
 let accounts = {
   normal:  { balance: 0, history: [] },
@@ -100,6 +114,39 @@ function nextIllust() {
 }
 
 /* =========================
+   🔒 ロック
+========================= */
+function showLock() {
+  document.getElementById("lock-screen").style.display = "block";
+  document.getElementById("main-screen").style.display = "none";
+  document.getElementById("password-input").value = "";
+  document.getElementById("password-error").innerText = "";
+}
+
+function showMain() {
+  document.getElementById("lock-screen").style.display = "none";
+  document.getElementById("main-screen").style.display = "block";
+}
+
+function tryUnlock() {
+  const input = document.getElementById("password-input").value;
+  if (input === SAVINGS_PASSWORD) {
+    savingsUnlocked = true;
+    showMain();
+    render();
+  } else {
+    document.getElementById("password-error").innerText = "❌ パスワードが違います";
+    document.getElementById("password-input").value = "";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("password-input").addEventListener("keydown", e => {
+    if (e.key === "Enter") tryUnlock();
+  });
+});
+
+/* =========================
    🔀 口座切替
 ========================= */
 function switchAccount(type) {
@@ -110,6 +157,12 @@ function switchAccount(type) {
     document.getElementById("tab-" + t).classList.toggle("active", t === type);
   });
 
+  if (type === "savings" && !savingsUnlocked) {
+    showLock();
+    return;
+  }
+
+  showMain();
   render();
 }
 
@@ -140,6 +193,13 @@ window.onload = async function () {
     }
   }
 
+  // 貯金口座で再開したときはロック
+  if (currentAccount === "savings" && !savingsUnlocked) {
+    showLock();
+    return;
+  }
+
+  showMain();
   render();
 };
 
