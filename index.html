@@ -31,13 +31,14 @@
       <button class="tab" id="tab-koto" onclick="switchAccount('koto')">Koto</button>
     </div>
 
-    <!-- ロック画面 -->
+    <!-- ロック画面（出金用） -->
     <div id="lock-screen" style="display:none;">
       <div class="lock-icon">🔒</div>
-      <div class="lock-text">ロックされています</div>
+      <div class="lock-text">出金にはパスワードが必要です</div>
       <input type="password" id="password-input" placeholder="パスワードを入力" />
       <div id="password-error"></div>
-      <button class="unlock-btn" onclick="tryUnlock()">解除</button>
+      <button class="unlock-btn" onclick="tryUnlock()">解除して出金</button>
+      <button class="cancel-btn" onclick="cancelUnlock()">キャンセル</button>
     </div>
 
     <!-- メイン画面 -->
@@ -79,7 +80,7 @@ const db = firebase.firestore();
 ========================= */
 const ACCOUNT_TYPES = ["normal", "savings", "koto"];
 const SAVINGS_PASSWORD = "1121";
-let savingsUnlocked = false;
+let pendingWithdrawAmount = null;
 
 let accounts = {
   normal:  { balance: 0, history: [] },
@@ -114,7 +115,7 @@ function nextIllust() {
 }
 
 /* =========================
-   🔒 ロック
+   🔒 ロック（出金用）
 ========================= */
 function showLock() {
   document.getElementById("lock-screen").style.display = "block";
@@ -131,13 +132,21 @@ function showMain() {
 function tryUnlock() {
   const input = document.getElementById("password-input").value;
   if (input === SAVINGS_PASSWORD) {
-    savingsUnlocked = true;
     showMain();
-    render();
+    // パスワード解除後に出金実行
+    if (pendingWithdrawAmount !== null) {
+      doWithdraw(pendingWithdrawAmount);
+      pendingWithdrawAmount = null;
+    }
   } else {
     document.getElementById("password-error").innerText = "❌ パスワードが違います";
     document.getElementById("password-input").value = "";
   }
+}
+
+function cancelUnlock() {
+  pendingWithdrawAmount = null;
+  showMain();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -156,11 +165,6 @@ function switchAccount(type) {
   ACCOUNT_TYPES.forEach(t => {
     document.getElementById("tab-" + t).classList.toggle("active", t === type);
   });
-
-  if (type === "savings" && !savingsUnlocked) {
-    showLock();
-    return;
-  }
 
   showMain();
   render();
@@ -191,12 +195,6 @@ window.onload = async function () {
       accounts[type].balance = doc.data().balance || 0;
       accounts[type].history = doc.data().history || [];
     }
-  }
-
-  // 貯金口座で再開したときはロック
-  if (currentAccount === "savings" && !savingsUnlocked) {
-    showLock();
-    return;
   }
 
   showMain();
@@ -283,6 +281,17 @@ function withdraw() {
     return;
   }
 
+  // 貯金口座はパスワード確認
+  if (currentAccount === "savings") {
+    pendingWithdrawAmount = amount;
+    showLock();
+    return;
+  }
+
+  doWithdraw(amount);
+}
+
+function doWithdraw(amount) {
   if (current().balance < amount) {
     addHistory("⚠ 残高不足で失敗");
     render();
