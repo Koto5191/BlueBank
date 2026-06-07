@@ -21,9 +21,6 @@
   --history-border: #e2e8f0;
   --toggle-bg: #e2e8f0;
   --toggle-text: #374151;
-  --shadow: 0 8px 32px rgba(37, 99, 235, 0.10);
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.07);
-  --radius: 20px;
   --radius-sm: 10px;
   --card-border: #dbeafe;
   --subtext: #6b7280;
@@ -48,8 +45,6 @@ body.dark {
   --history-border: #334155;
   --toggle-bg: #252d3d;
   --toggle-text: #94a3b8;
-  --shadow: 0 8px 32px rgba(0,0,0,0.4);
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
   --card-border: #334155;
   --subtext: #94a3b8;
 }
@@ -120,7 +115,8 @@ body {
 }
 
 .card-illust {
-  width: 300px;
+  width: 100%;
+  max-width: 300px;
   height: 180px;
   object-fit: cover;
   border-radius: 14px;
@@ -143,171 +139,12 @@ body {
   padding: 0;
   line-height: 34px;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .illust-arrow:hover {
   opacity: 0.8;
   transform: scale(1.1);
-}
-
-/* ---------- 残高ラベル ---------- */
-.balance-label {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-bottom: 2px;
-}
-
-/* ---------- 残高 ---------- */
-.balance {
-  font-size: 36px;
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: -1px;
-  line-height: 1.1;
-  margin-bottom: 4px;
-  transition: transform 0.15s;
-}
-
-.balance.pop {
-  animation: pop 0.25s ease;
-}
-
-@keyframes pop {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.06); }
-  100% { transform: scale(1); }
-}
-
-#next-goal,
-#next-goal-normal {
-  font-size: 12px;
-  color: var(--accent);
-  margin-bottom: 16px;
-  font-weight: 500;
-}
-
-/* ---------- 入力 ---------- */
-input[type="number"] {
-  width: 100%;
-  background: var(--input-bg);
-  border: 1.5px solid var(--input-border);
-  border-radius: var(--radius-sm);
-  padding: 11px 14px;
-  font-size: 16px;
-  color: var(--text);
-  outline: none;
-  transition: border-color 0.2s;
-  font-family: inherit;
-  margin-bottom: 12px;
-}
-
-input[type="number"]:focus {
-  border-color: var(--accent);
-}
-
-input[type="number"]::placeholder {
-  color: var(--text-muted);
-}
-
-/* ---------- 入金・出金ボタン ---------- */
-.deposit,
-.withdraw {
-  display: inline-block;
-  padding: 11px 0;
-  width: calc(50% - 5px);
-  border-radius: var(--radius-sm);
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: 0.18s;
-  font-family: inherit;
-}
-
-.deposit {
-  background: var(--deposit-bg);
-  color: var(--deposit-text);
-  margin-right: 10px;
-}
-
-.deposit:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.deposit:active {
-  transform: translateY(0);
-}
-
-.withdraw {
-  background: var(--withdraw-bg);
-  color: var(--withdraw-text);
-  border: 1.5px solid var(--withdraw-border);
-}
-
-.withdraw:hover {
-  filter: brightness(0.97);
-  transform: translateY(-1px);
-}
-
-.withdraw:active {
-  transform: translateY(0);
-}
-
-/* ---------- 履歴（共通） ---------- */
-.card h3 {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text);
-  margin: 20px 0 10px;
-}
-
-#history,
-#history-normal {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  max-height: 220px;
-  overflow-y: auto;
-  padding-right: 2px;
-}
-
-#history::-webkit-scrollbar,
-#history-normal::-webkit-scrollbar {
-  width: 4px;
-}
-
-#history::-webkit-scrollbar-track,
-#history-normal::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-#history::-webkit-scrollbar-thumb,
-#history-normal::-webkit-scrollbar-thumb {
-  background: var(--input-border);
-  border-radius: 4px;
-}
-
-#history li,
-#history-normal li {
-  background: var(--history-bg);
-  border: 1px solid var(--history-border);
-  border-radius: var(--radius-sm);
-  padding: 9px 13px;
-  font-size: 13px;
-  color: var(--text-muted);
-  transition: background 0.2s;
-}
-
-#history li:first-child,
-#history-normal li:first-child {
-  animation: slideIn 0.2s ease;
-}
-
-@keyframes slideIn {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ---------- タブ ---------- */
@@ -344,6 +181,163 @@ input[type="number"]::placeholder {
 .tab:hover:not(.active) {
   border-color: #3b82f6;
   color: var(--accent);
+}
+
+/* ---------- 残高ラベル ---------- */
+.balance-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+  margin-top: 8px;
+}
+
+/* ---------- 残高 ---------- */
+.balance {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -1px;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.balance.pop {
+  animation: pop 0.25s ease;
+}
+
+@keyframes pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+#next-goal,
+#next-goal-normal {
+  font-size: 12px;
+  color: var(--accent);
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+/* ---------- 入力 ---------- */
+input[type="number"] {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1.5px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  padding: 11px 14px;
+  font-size: 16px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+  margin-bottom: 12px;
+  margin-top: 8px;
+}
+
+input[type="number"]:focus {
+  border-color: var(--accent);
+}
+
+input[type="number"]::placeholder {
+  color: var(--text-muted);
+}
+
+/* ---------- 入金・出金ボタン ---------- */
+.deposit,
+.withdraw {
+  display: inline-block;
+  padding: 11px 0;
+  width: calc(50% - 5px);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: 0.18s;
+  font-family: inherit;
+  margin: 0;
+}
+
+.deposit {
+  background: var(--deposit-bg);
+  color: var(--deposit-text);
+  margin-right: 10px;
+}
+
+.deposit:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.deposit:active {
+  transform: translateY(0);
+}
+
+.withdraw {
+  background: var(--withdraw-bg);
+  color: var(--withdraw-text);
+  border: 1.5px solid var(--withdraw-border);
+}
+
+.withdraw:hover {
+  filter: brightness(0.97);
+  transform: translateY(-1px);
+}
+
+.withdraw:active {
+  transform: translateY(0);
+}
+
+/* ---------- 履歴 ---------- */
+.card h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 20px 0 10px;
+}
+
+.history-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 2px;
+  padding-left: 0;
+}
+
+.history-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.history-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.history-list::-webkit-scrollbar-thumb {
+  background: var(--input-border);
+  border-radius: 4px;
+}
+
+.history-list li {
+  background: var(--history-bg);
+  border: 1px solid var(--history-border);
+  border-radius: var(--radius-sm);
+  padding: 9px 13px;
+  font-size: 13px;
+  color: var(--text-muted);
+  transition: background 0.2s;
+}
+
+.history-list li:first-child {
+  animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ---------- ロック画面 ---------- */
@@ -440,13 +434,6 @@ input[type="password"]::placeholder {
   margin-bottom: 8px;
 }
 
-.koto-label {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-bottom: 4px;
-  font-weight: 600;
-}
-
 .koto-divider {
   border: none;
   border-top: 1.5px solid var(--history-border);
@@ -458,5 +445,5 @@ input[type="password"]::placeholder {
   font-weight: 700;
   color: #f59e0b;
   letter-spacing: -1px;
-  margin-bottom: 12px;
+  margin-bottom: 4px;
 }

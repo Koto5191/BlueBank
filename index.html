@@ -47,7 +47,7 @@
       <!-- Koto口座専用パネル -->
       <div id="koto-panel" style="display:none;">
         <div class="koto-section">
-          <div class="koto-label">自分の貯金</div>
+          <div class="balance-label">自分の貯金</div>
           <div class="balance" id="balance">¥0</div>
           <div id="next-goal"></div>
           <input type="number" id="amount" placeholder="金額を入力" />
@@ -59,7 +59,7 @@
         <div class="koto-divider"></div>
 
         <div class="koto-section">
-          <div class="koto-label">📤 貸付中</div>
+          <div class="balance-label">📤 貸付中</div>
           <div class="loan-balance" id="loan-balance">¥0</div>
           <input type="number" id="loan-amount" placeholder="金額を入力" />
           <br>
@@ -68,7 +68,7 @@
         </div>
 
         <h3>📜 履歴</h3>
-        <ul id="history"></ul>
+        <ul class="history-list" id="history"></ul>
       </div>
 
       <!-- 通常・貯金口座パネル -->
@@ -81,7 +81,7 @@
         <button class="deposit" onclick="deposit()">入金</button>
         <button class="withdraw" onclick="withdraw()">出金</button>
         <h3>📜 履歴</h3>
-        <ul id="history-normal"></ul>
+        <ul class="history-list" id="history-normal"></ul>
       </div>
 
     </div>
@@ -295,6 +295,13 @@ function save() {
   db.collection("bank").doc(currentAccount).set(data);
 }
 
+function saveAccount(type) {
+  const acc = accounts[type];
+  const data = { balance: acc.balance, history: acc.history };
+  if (type === "koto") data.loan = acc.loan;
+  db.collection("bank").doc(type).set(data);
+}
+
 /* =========================
    📦 金額取得
 ========================= */
@@ -379,8 +386,11 @@ function loanReduce() {
     addHistory("⚠ 返済額が貸付残高を超えています");
     render(); save(); return;
   }
+  // 貸付残高を減らす
   current().loan -= amount;
-  addHistory("✅ 返済 ¥" + amount.toLocaleString());
+  addHistory("✅ 返済 ¥" + amount.toLocaleString() + " → 自分の貯金に追加");
+  // 自分の貯金にも追加
+  current().balance += amount;
   render(); save();
 }
 
