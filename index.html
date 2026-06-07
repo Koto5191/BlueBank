@@ -87,323 +87,330 @@
     </div>
   </div>
 
-  <script>
-    /* =========================
-       🔥 Firebase初期化
-    ========================= */
-    const firebaseConfig = {
-      apiKey: "AIzaSyBnbPO7vnZg4ohzCQqTjML4u0Gt2rvX17w",
-      authDomain: "bluebank-5191.firebaseapp.com",
-      projectId: "bluebank-5191",
-      storageBucket: "bluebank-5191.firebasestorage.app",
-      messagingSenderId: "898172429411",
-      appId: "1:898172429411:web:51198f69778744fa2a4456"
-    };
+<script>
+/* =========================
+   🔥 Firebase初期化
+========================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyBnbPO7vnZg4ohzCQqTjML4u0Gt2rvX17w",
+  authDomain: "bluebank-5191.firebaseapp.com",
+  projectId: "bluebank-5191",
+  storageBucket: "bluebank-5191.firebasestorage.app",
+  messagingSenderId: "898172429411",
+  appId: "1:898172429411:web:51198f69778744fa2a4456"
+};
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-    /* =========================
-       🏦 状態
-    ========================= */
-    const ACCOUNT_TYPES = ["normal", "savings", "koto"];
-    const SAVINGS_PASSWORD = "1121";
-    let pendingWithdrawAmount = null;
+/* =========================
+   🏦 状態
+========================= */
+const ACCOUNT_TYPES = ["normal", "savings", "koto"];
+const SAVINGS_PASSWORD = "1121";
+let pendingWithdrawAmount = null;
 
-    let accounts = {
-      normal: { balance: 0, history: [] },
-      savings: { balance: 0, history: [] },
-      koto: { balance: 0, history: [], loan: 73000 }
-    };
-    let currentAccount = localStorage.getItem("currentAccount") || "normal";
+let accounts = {
+  normal:  { balance: 0, history: [] },
+  savings: { balance: 0, history: [] },
+  koto:    { balance: 0, history: [], loan: 73000 }
+};
+let currentAccount = localStorage.getItem("currentAccount") || "normal";
 
-    function current() {
-      return accounts[currentAccount];
+function current() {
+  return accounts[currentAccount];
+}
+
+/* =========================
+   🖼 イラスト
+========================= */
+const ILLUST_COUNT = 4;
+let illustIndex = Number(localStorage.getItem("illustIndex") || 0);
+
+function updateIllust() {
+  document.getElementById("card-illust").src = "card" + (illustIndex + 1) + ".png";
+  localStorage.setItem("illustIndex", illustIndex);
+}
+
+function prevIllust() {
+  illustIndex = (illustIndex - 1 + ILLUST_COUNT) % ILLUST_COUNT;
+  updateIllust();
+}
+
+function nextIllust() {
+  illustIndex = (illustIndex + 1) % ILLUST_COUNT;
+  updateIllust();
+}
+
+/* =========================
+   🎨 背景切替
+========================= */
+function applyBackground(isDark) {
+  if (isDark) {
+    document.body.style.backgroundColor = "#1e3a5f";
+    document.body.style.backgroundImage = "repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255,255,255,0.15) 20px, rgba(255,255,255,0.15) 40px)";
+  } else {
+    document.body.style.backgroundColor = "#00bcd4";
+    document.body.style.backgroundImage = "repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(0,0,0,0.15) 20px, rgba(0,0,0,0.15) 40px)";
+  }
+}
+
+/* =========================
+   🔒 ロック（出金用）
+========================= */
+function showLock() {
+  document.getElementById("lock-screen").style.display = "block";
+  document.getElementById("main-screen").style.display = "none";
+  document.getElementById("password-input").value = "";
+  document.getElementById("password-error").innerText = "";
+}
+
+function showMain() {
+  document.getElementById("lock-screen").style.display = "none";
+  document.getElementById("main-screen").style.display = "block";
+}
+
+function tryUnlock() {
+  const input = document.getElementById("password-input").value;
+  if (input === SAVINGS_PASSWORD) {
+    showMain();
+    if (pendingWithdrawAmount !== null) {
+      doWithdraw(pendingWithdrawAmount);
+      pendingWithdrawAmount = null;
     }
+  } else {
+    document.getElementById("password-error").innerText = "❌ パスワードが違います";
+    document.getElementById("password-input").value = "";
+  }
+}
 
-    /* =========================
-       🖼 イラスト
-    ========================= */
-    const ILLUST_COUNT = 4;
-    let illustIndex = Number(localStorage.getItem("illustIndex") || 0);
+function cancelUnlock() {
+  pendingWithdrawAmount = null;
+  showMain();
+}
 
-    function updateIllust() {
-      document.getElementById("card-illust").src = "card" + (illustIndex + 1) + ".png";
-      localStorage.setItem("illustIndex", illustIndex);
-    }
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("password-input").addEventListener("keydown", e => {
+    if (e.key === "Enter") tryUnlock();
+  });
+});
 
-    function prevIllust() {
-      illustIndex = (illustIndex - 1 + ILLUST_COUNT) % ILLUST_COUNT;
-      updateIllust();
-    }
+/* =========================
+   🔀 口座切替
+========================= */
+function switchAccount(type) {
+  currentAccount = type;
+  localStorage.setItem("currentAccount", type);
 
-    function nextIllust() {
-      illustIndex = (illustIndex + 1) % ILLUST_COUNT;
-      updateIllust();
-    }
+  ACCOUNT_TYPES.forEach(t => {
+    document.getElementById("tab-" + t).classList.toggle("active", t === type);
+  });
 
-    /* =========================
-       🔒 ロック（出金用）
-    ========================= */
-    function showLock() {
-      document.getElementById("lock-screen").style.display = "block";
-      document.getElementById("main-screen").style.display = "none";
-      document.getElementById("password-input").value = "";
-      document.getElementById("password-error").innerText = "";
-    }
+  showMain();
+  renderPanel();
+  render();
+}
 
-    function showMain() {
-      document.getElementById("lock-screen").style.display = "none";
-      document.getElementById("main-screen").style.display = "block";
-    }
+function renderPanel() {
+  const isKoto = currentAccount === "koto";
+  document.getElementById("koto-panel").style.display = isKoto ? "block" : "none";
+  document.getElementById("normal-panel").style.display = isKoto ? "none" : "block";
+}
 
-    function tryUnlock() {
-      const input = document.getElementById("password-input").value;
-      if (input === SAVINGS_PASSWORD) {
-        showMain();
-        if (pendingWithdrawAmount !== null) {
-          doWithdraw(pendingWithdrawAmount);
-          pendingWithdrawAmount = null;
-        }
-      } else {
-        document.getElementById("password-error").innerText = "❌ パスワードが違います";
-        document.getElementById("password-input").value = "";
+/* =========================
+   📥 初期ロード
+========================= */
+window.onload = async function () {
+  const isDark = localStorage.getItem("theme") === "dark";
+  applyBackground(isDark);
+
+  if (isDark) {
+    document.body.classList.add("dark");
+    document.querySelector(".theme-toggle").innerText = "☀️ ライト";
+  }
+
+  updateIllust();
+
+  ACCOUNT_TYPES.forEach(t => {
+    document.getElementById("tab-" + t).classList.toggle("active", t === currentAccount);
+  });
+
+  for (const type of ACCOUNT_TYPES) {
+    const doc = await db.collection("bank").doc(type).get();
+    if (doc.exists) {
+      accounts[type].balance = doc.data().balance || 0;
+      accounts[type].history = doc.data().history || [];
+      if (type === "koto") {
+        accounts[type].loan = doc.data().loan !== undefined ? doc.data().loan : 73000;
       }
     }
+  }
 
-    function cancelUnlock() {
-      pendingWithdrawAmount = null;
-      showMain();
-    }
+  showMain();
+  renderPanel();
+  render();
+};
 
-    document.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("password-input").addEventListener("keydown", e => {
-        if (e.key === "Enter") tryUnlock();
-      });
+/* =========================
+   🎨 画面更新
+========================= */
+function render() {
+  if (currentAccount === "koto") {
+    const { balance, history, loan } = current();
+
+    const balanceEl = document.getElementById("balance");
+    balanceEl.classList.remove("pop");
+    void balanceEl.offsetWidth;
+    balanceEl.classList.add("pop");
+    balanceEl.innerText = "¥" + balance.toLocaleString();
+
+    const nextMan = Math.ceil((balance + 1) / 10000) * 10000;
+    const diff = nextMan - balance;
+    document.getElementById("next-goal").innerText = "あと¥" + diff.toLocaleString() + "で" + (nextMan / 10000) + "万円！";
+
+    document.getElementById("loan-balance").innerText = "¥" + loan.toLocaleString();
+
+    const list = document.getElementById("history");
+    list.innerHTML = "";
+    history.slice().reverse().forEach(text => {
+      const li = document.createElement("li");
+      li.innerText = text;
+      list.appendChild(li);
     });
 
-    /* =========================
-       🔀 口座切替
-    ========================= */
-    function switchAccount(type) {
-      currentAccount = type;
-      localStorage.setItem("currentAccount", type);
+  } else {
+    const { balance, history } = current();
 
-      ACCOUNT_TYPES.forEach(t => {
-        document.getElementById("tab-" + t).classList.toggle("active", t === type);
-      });
+    const balanceEl = document.getElementById("balance-normal");
+    balanceEl.classList.remove("pop");
+    void balanceEl.offsetWidth;
+    balanceEl.classList.add("pop");
+    balanceEl.innerText = "¥" + balance.toLocaleString();
 
-      showMain();
-      renderPanel();
-      render();
-    }
+    const nextMan = Math.ceil((balance + 1) / 10000) * 10000;
+    const diff = nextMan - balance;
+    document.getElementById("next-goal-normal").innerText = "あと¥" + diff.toLocaleString() + "で" + (nextMan / 10000) + "万円！";
 
-    function renderPanel() {
-      const isKoto = currentAccount === "koto";
-      document.getElementById("koto-panel").style.display = isKoto ? "block" : "none";
-      document.getElementById("normal-panel").style.display = isKoto ? "none" : "block";
-    }
+    const list = document.getElementById("history-normal");
+    list.innerHTML = "";
+    history.slice().reverse().forEach(text => {
+      const li = document.createElement("li");
+      li.innerText = text;
+      list.appendChild(li);
+    });
+  }
+}
 
-    /* =========================
-       📥 初期ロード
-    ========================= */
-    window.onload = async function () {
-      if (localStorage.getItem("theme") === "dark") {
-        document.body.classList.add("dark");
-        document.querySelector(".theme-toggle").innerText = "☀️ ライト";
-      }
+/* =========================
+   💾 保存（Firebase）
+========================= */
+function save() {
+  const acc = current();
+  const data = { balance: acc.balance, history: acc.history };
+  if (currentAccount === "koto") data.loan = acc.loan;
+  db.collection("bank").doc(currentAccount).set(data);
+}
 
-      updateIllust();
+/* =========================
+   📦 金額取得
+========================= */
+function getAmount() {
+  const id = currentAccount === "koto" ? "amount" : "amount-normal";
+  return Number(document.getElementById(id).value);
+}
 
-      ACCOUNT_TYPES.forEach(t => {
-        document.getElementById("tab-" + t).classList.toggle("active", t === currentAccount);
-      });
+function getLoanAmount() {
+  return Number(document.getElementById("loan-amount").value);
+}
 
-      for (const type of ACCOUNT_TYPES) {
-        const doc = await db.collection("bank").doc(type).get();
-        if (doc.exists) {
-          accounts[type].balance = doc.data().balance || 0;
-          accounts[type].history = doc.data().history || [];
-          if (type === "koto") {
-            accounts[type].loan = doc.data().loan !== undefined ? doc.data().loan : 73000;
-          }
-        }
-      }
+/* =========================
+   📜 履歴追加
+========================= */
+function addHistory(text) {
+  current().history.push(text);
+}
 
-      showMain();
-      renderPanel();
-      render();
-    };
+/* =========================
+   💰 入金
+========================= */
+function deposit() {
+  const amount = getAmount();
+  if (!amount || amount <= 0) {
+    addHistory("⚠ 正しい金額を入力してね");
+    render(); save(); return;
+  }
+  current().balance += amount;
+  addHistory("＋ ¥" + amount.toLocaleString() + " 入金");
+  render(); save();
+}
 
-    /* =========================
-       🎨 画面更新
-    ========================= */
-    function render() {
-      if (currentAccount === "koto") {
-        const { balance, history, loan } = current();
+/* =========================
+   💸 出金
+========================= */
+function withdraw() {
+  const amount = getAmount();
+  if (!amount || amount <= 0) {
+    addHistory("⚠ 正しい金額を入力してね");
+    render(); save(); return;
+  }
+  if (currentAccount === "savings") {
+    pendingWithdrawAmount = amount;
+    showLock();
+    return;
+  }
+  doWithdraw(amount);
+}
 
-        const balanceEl = document.getElementById("balance");
-        balanceEl.classList.remove("pop");
-        void balanceEl.offsetWidth;
-        balanceEl.classList.add("pop");
-        balanceEl.innerText = "¥" + balance.toLocaleString();
+function doWithdraw(amount) {
+  if (current().balance < amount) {
+    addHistory("⚠ 残高不足で失敗");
+    render(); save(); return;
+  }
+  current().balance -= amount;
+  addHistory("－ ¥" + amount.toLocaleString() + " 出金");
+  render(); save();
+}
 
-        const nextMan = Math.ceil((balance + 1) / 10000) * 10000;
-        const diff = nextMan - balance;
-        document.getElementById("next-goal").innerText = "あと¥" + diff.toLocaleString() + "で" + (nextMan / 10000) + "万円！";
+/* =========================
+   📤 貸付操作
+========================= */
+function loanAdd() {
+  const amount = getLoanAmount();
+  if (!amount || amount <= 0) {
+    addHistory("⚠ 正しい金額を入力してね");
+    render(); save(); return;
+  }
+  current().loan += amount;
+  addHistory("📤 貸付 ＋¥" + amount.toLocaleString());
+  render(); save();
+}
 
-        document.getElementById("loan-balance").innerText = "¥" + loan.toLocaleString();
+function loanReduce() {
+  const amount = getLoanAmount();
+  if (!amount || amount <= 0) {
+    addHistory("⚠ 正しい金額を入力してね");
+    render(); save(); return;
+  }
+  if (current().loan < amount) {
+    addHistory("⚠ 返済額が貸付残高を超えています");
+    render(); save(); return;
+  }
+  current().loan -= amount;
+  addHistory("✅ 返済 ¥" + amount.toLocaleString() + " → 自分の貯金に追加");
+  current().balance += amount;
+  render(); save();
+}
 
-        const list = document.getElementById("history");
-        list.innerHTML = "";
-        history.slice().reverse().forEach(text => {
-          const li = document.createElement("li");
-          li.innerText = text;
-          list.appendChild(li);
-        });
-
-      } else {
-        const { balance, history } = current();
-
-        const balanceEl = document.getElementById("balance-normal");
-        balanceEl.classList.remove("pop");
-        void balanceEl.offsetWidth;
-        balanceEl.classList.add("pop");
-        balanceEl.innerText = "¥" + balance.toLocaleString();
-
-        const nextMan = Math.ceil((balance + 1) / 10000) * 10000;
-        const diff = nextMan - balance;
-        document.getElementById("next-goal-normal").innerText = "あと¥" + diff.toLocaleString() + "で" + (nextMan / 10000) + "万円！";
-
-        const list = document.getElementById("history-normal");
-        list.innerHTML = "";
-        history.slice().reverse().forEach(text => {
-          const li = document.createElement("li");
-          li.innerText = text;
-          list.appendChild(li);
-        });
-      }
-    }
-
-    /* =========================
-       💾 保存（Firebase）
-    ========================= */
-    function save() {
-      const acc = current();
-      const data = { balance: acc.balance, history: acc.history };
-      if (currentAccount === "koto") data.loan = acc.loan;
-      db.collection("bank").doc(currentAccount).set(data);
-    }
-
-    function saveAccount(type) {
-      const acc = accounts[type];
-      const data = { balance: acc.balance, history: acc.history };
-      if (type === "koto") data.loan = acc.loan;
-      db.collection("bank").doc(type).set(data);
-    }
-
-    /* =========================
-       📦 金額取得
-    ========================= */
-    function getAmount() {
-      const id = currentAccount === "koto" ? "amount" : "amount-normal";
-      return Number(document.getElementById(id).value);
-    }
-
-    function getLoanAmount() {
-      return Number(document.getElementById("loan-amount").value);
-    }
-
-    /* =========================
-       📜 履歴追加
-    ========================= */
-    function addHistory(text) {
-      current().history.push(text);
-    }
-
-    /* =========================
-       💰 入金
-    ========================= */
-    function deposit() {
-      const amount = getAmount();
-      if (!amount || amount <= 0) {
-        addHistory("⚠ 正しい金額を入力してね");
-        render(); save(); return;
-      }
-      current().balance += amount;
-      addHistory("＋ ¥" + amount.toLocaleString() + " 入金");
-      render(); save();
-    }
-
-    /* =========================
-       💸 出金
-    ========================= */
-    function withdraw() {
-      const amount = getAmount();
-      if (!amount || amount <= 0) {
-        addHistory("⚠ 正しい金額を入力してね");
-        render(); save(); return;
-      }
-      if (currentAccount === "savings") {
-        pendingWithdrawAmount = amount;
-        showLock();
-        return;
-      }
-      doWithdraw(amount);
-    }
-
-    function doWithdraw(amount) {
-      if (current().balance < amount) {
-        addHistory("⚠ 残高不足で失敗");
-        render(); save(); return;
-      }
-      current().balance -= amount;
-      addHistory("－ ¥" + amount.toLocaleString() + " 出金");
-      render(); save();
-    }
-
-    /* =========================
-       📤 貸付操作
-    ========================= */
-    function loanAdd() {
-      const amount = getLoanAmount();
-      if (!amount || amount <= 0) {
-        addHistory("⚠ 正しい金額を入力してね");
-        render(); save(); return;
-      }
-      current().loan += amount;
-      addHistory("📤 貸付 ＋¥" + amount.toLocaleString());
-      render(); save();
-    }
-
-    function loanReduce() {
-      const amount = getLoanAmount();
-      if (!amount || amount <= 0) {
-        addHistory("⚠ 正しい金額を入力してね");
-        render(); save(); return;
-      }
-      if (current().loan < amount) {
-        addHistory("⚠ 返済額が貸付残高を超えています");
-        render(); save(); return;
-      }
-      // 貸付残高を減らす
-      current().loan -= amount;
-      addHistory("✅ 返済 ¥" + amount.toLocaleString() + " → 自分の貯金に追加");
-      // 自分の貯金にも追加
-      current().balance += amount;
-      render(); save();
-    }
-
-    /* =========================
-       🌙 テーマ切替
-    ========================= */
-    function toggleTheme() {
-      const isDark = document.body.classList.toggle("dark");
-      document.querySelector(".theme-toggle").innerText = isDark ? "☀️ ライト" : "🌙 ダーク";
-      localStorage.setItem("theme", isDark ? "dark" : "light");
-    }
-  </script>
+/* =========================
+   🌙 テーマ切替
+========================= */
+function toggleTheme() {
+  const isDark = document.body.classList.toggle("dark");
+  document.querySelector(".theme-toggle").innerText = isDark ? "☀️ ライト" : "🌙 ダーク";
+  localStorage.setItem("theme", isDark ? "dark" : "light");
+  applyBackground(isDark);
+}
+</script>
 
 </body>
-
 </html>
