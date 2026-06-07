@@ -77,16 +77,22 @@ body {
   color: var(--text);
   font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
   min-height: 100vh;
-  padding: 0;
-  transition: background 0.3s, color 0.3s;
+  padding: 24px 16px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 /* ---------- カード ---------- */
 .card {
   background: var(--card-bg);
-  padding: 28px 24px 24px;
+  padding: 28px 24px 32px;
   width: 100%;
-  min-height: 100vh;
+  max-width: 420px;
+  min-height: auto;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(37, 99, 235, 0.10);
   position: relative;
   transition: background 0.3s;
 }
@@ -132,7 +138,7 @@ body {
 .card-illust {
   width: 100%;
   max-width: 300px;
-  height: 180px;
+  height: 160px;
   object-fit: cover;
   border-radius: 14px;
   box-shadow: 0 4px 16px rgba(37, 99, 235, 0.18);
