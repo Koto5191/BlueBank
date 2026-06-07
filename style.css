@@ -116,7 +116,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin: 16px 0 40px;
+  margin: 16px 0 20px;
 }
 
 .card-illust {
@@ -150,13 +150,14 @@ body {
   transform: scale(1.1);
 }
 
-/* ---------- 残高 ---------- */
-.card > div:nth-of-type(1) {
+/* ---------- 残高ラベル ---------- */
+.balance-label {
   font-size: 13px;
   color: var(--text-muted);
   margin-bottom: 2px;
 }
 
+/* ---------- 残高 ---------- */
 .balance {
   font-size: 36px;
   font-weight: 700;
@@ -177,7 +178,8 @@ body {
   100% { transform: scale(1); }
 }
 
-#next-goal {
+#next-goal,
+#next-goal-normal {
   font-size: 12px;
   color: var(--accent);
   margin-bottom: 16px;
@@ -252,7 +254,7 @@ input[type="number"]::placeholder {
   transform: translateY(0);
 }
 
-/* ---------- 履歴 ---------- */
+/* ---------- 履歴（共通） ---------- */
 .card h3 {
   font-size: 15px;
   font-weight: 600;
@@ -260,7 +262,8 @@ input[type="number"]::placeholder {
   margin: 20px 0 10px;
 }
 
-#history {
+#history,
+#history-normal {
   list-style: none;
   display: flex;
   flex-direction: column;
@@ -270,20 +273,24 @@ input[type="number"]::placeholder {
   padding-right: 2px;
 }
 
-#history::-webkit-scrollbar {
+#history::-webkit-scrollbar,
+#history-normal::-webkit-scrollbar {
   width: 4px;
 }
 
-#history::-webkit-scrollbar-track {
+#history::-webkit-scrollbar-track,
+#history-normal::-webkit-scrollbar-track {
   background: transparent;
 }
 
-#history::-webkit-scrollbar-thumb {
+#history::-webkit-scrollbar-thumb,
+#history-normal::-webkit-scrollbar-thumb {
   background: var(--input-border);
   border-radius: 4px;
 }
 
-#history li {
+#history li,
+#history-normal li {
   background: var(--history-bg);
   border: 1px solid var(--history-border);
   border-radius: var(--radius-sm);
@@ -293,7 +300,8 @@ input[type="number"]::placeholder {
   transition: background 0.2s;
 }
 
-#history li:first-child {
+#history li:first-child,
+#history-normal li:first-child {
   animation: slideIn 0.2s ease;
 }
 
